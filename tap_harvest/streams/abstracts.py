@@ -98,18 +98,19 @@ class BaseStream(ABC):
          - https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md
         """
 
-    def get_records(self) -> Any:
-        """Interacts with api client interaction and pagination."""
-        page = 1
-        while page:
-            self.params["page"] = page
-            response = self.client.get(
-                self.url_endpoint, self.params, self.headers, self.path
-            )
-            raw_records = response.get(self.data_key, [])
+def get_records(self) -> Iterator[Any]:
+        """Interacts with api client interaction and cursor-based pagination."""
+        current_url = self.url_endpoint
+        current_params = self.params
 
-            page = response.get(self.next_page_key)
-            yield from raw_records
+        while current_url:
+            response = self.client.get(
+                current_url, current_params, self.headers, self.path
+            )            
+            yield from response.get(self.data_key, [])
+
+            current_url = response.get("links", {}).get("next")
+            current_params = {}
 
     def write_schema(self):
         """Write a schema message."""

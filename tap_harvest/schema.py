@@ -3,6 +3,7 @@ import json
 import singer
 from typing import Dict, Tuple
 from singer import metadata
+from tap_harvest.client import Client
 from tap_harvest.streams import STREAMS
 
 LOGGER = singer.get_logger()
@@ -70,7 +71,7 @@ def get_schemas() -> Tuple[Dict, Dict]:
 
     return schemas, field_metadata
 
-def write_schema(stream, client, streams_to_sync, catalog) -> None:
+def write_schema(stream, client: Client, streams_to_sync, catalog) -> None:
     """Collect nested child streams to sync and write schema for selected
     streams."""
     if stream.is_selected():

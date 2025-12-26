@@ -111,21 +111,21 @@ class Client:
 
         raise Exception("No Active Harvest Account found") from None
 
-    def authenticate(self, headers: Dict, params: Dict) -> Tuple[Dict, Dict]:
+    def authenticate(self, headers: Dict) -> Dict:
         """Authenticates the request with the token."""
         headers["Authorization"] = f"Bearer {self.get_access_token()}"
         headers["User-Agent"] = self.config["user_agent"]
         if self._account_id:
             headers["Harvest-Account-Id"] = self._account_id
 
-        return headers, params
+        return headers
 
     def get(
         self, endpoint: str, params: Dict = {}, headers: Dict = {}, path: str = None
     ) -> Any:
         """Calls the make_request method with a prefixed method type `GET`"""
         endpoint = endpoint or f"{self.base_url}/{path}"
-        headers, params = self.authenticate(headers, params)
+        headers = self.authenticate(headers)
         return self.__make_request(
             "GET",
             endpoint,
